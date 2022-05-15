@@ -4,14 +4,19 @@ import com.th.transaction.dto.TransactionRq;
 import com.th.transaction.dto.TransactionRs;
 import com.th.transaction.entity.Transaction;
 import com.th.transaction.repository.TransactionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TransactionService {
 
     @Autowired
@@ -31,12 +36,13 @@ public class TransactionService {
                     .amount(transactionRq.getAmount())
                     .fee(transactionRq.getFee())
                     .refNo(transactionRq.getRefNo())
+                    .inquiryDate(LocalDateTime.now())
                     .transactionStatus(transactionRq.getTransactionStatus())
                     .build();
             transactionRepository.save(transaction);
             ecm.getCache("transaction").put(transaction.getRefNo(), transaction, 1L, TimeUnit.MINUTES);
         } else {
-            transactionRepository.updateTransactionStatus(transactionRq.getTransactionStatus(), transactionRq.getTransactionId());
+            transactionRepository.updateTransactionStatus(transactionRq.getTransactionStatus(), transactionRq.getTransactionId(), LocalDateTime.now());
         }
     }
 
@@ -56,5 +62,13 @@ public class TransactionService {
                 .refNo(transaction.getRefNo())
                 .transactionStatus(transaction.getTransactionStatus())
                 .build();
+    }
+
+    public List<TransactionRs> getAllTrx() {
+        List<Transaction> listTrx = transactionRepository.findAll();
+        log.info("all transaction [{}]", listTrx);
+        return listTrx.stream().map(trx -> new TransactionRs(trx.getTransactionId(), trx.getSrcAccountNo(),
+                        trx.getDestNo(), trx.getDestName(), trx.getBiller(), trx.getAmount(), trx.getFee(), trx.getRefNo(), trx.getTransactionStatus()))
+                .collect(Collectors.toList());
     }
 }

@@ -114,4 +114,31 @@ public class TransactionControllerTest {
                         )))
                 .andExpect(status().isBadRequest());
     }
+
+    @SneakyThrows
+    @Test
+    public void allTrx_expectSuccess() {
+        mockMvc.perform(post("/v1/alltrx")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(TransactionRq.builder()
+                                .biller("GOPAY")
+                                .amount(new BigDecimal("10000"))
+                                .destNo("456456789")
+                                .srcAccountNo("4567864568")
+                                .destName("data")
+                                .fee(new BigDecimal("1000"))
+                                .transactionStatus(1)
+                                .refNo("23211")
+                                .build()
+                        )))
+                .andExpect(status().isOk());
+    }
+
+    @SneakyThrows
+    @Test
+    public void allTrx_expectError() {
+        when(transactionService.getAllTrx()).thenThrow(NullPointerException.class);
+        mockMvc.perform(post("/v1/alltrx"))
+                .andExpect(status().isBadRequest());
+    }
 }

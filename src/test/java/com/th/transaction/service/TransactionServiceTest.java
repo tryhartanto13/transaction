@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -73,6 +74,22 @@ public class TransactionServiceTest {
                 .build());
         TransactionRs transactionRs = transactionService.getTransaction(TransactionRq.builder().refNo("23211").build());
         Assert.assertNotNull(transactionRs);
+    }
+
+    @Test
+    public void getAllTrx_expectSuccess(){
+        transactionService.storeTransaction(TransactionRq.builder()
+                .biller("GOPAY")
+                .amount(new BigDecimal("10000"))
+                .destNo("456456789")
+                .srcAccountNo("4567864568")
+                .destName("data")
+                .fee(new BigDecimal("1000"))
+                .transactionStatus(1)
+                .refNo("23211")
+                .build());
+        List<TransactionRs> transactionRsList = transactionService.getAllTrx();
+        Assert.assertNotNull(transactionRsList);
     }
 
     @After

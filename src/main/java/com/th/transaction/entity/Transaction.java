@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -26,5 +27,7 @@ public class Transaction implements Serializable {
     private BigDecimal amount;
     private BigDecimal fee;
     private String refNo;
+    private LocalDateTime inquiryDate;
+    private LocalDateTime paymentDate;
     private int transactionStatus;
 }
