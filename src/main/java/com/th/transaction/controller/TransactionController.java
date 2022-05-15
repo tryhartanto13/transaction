@@ -24,6 +24,7 @@ public class TransactionController {
         try {
             transactionService.storeTransaction(transactionRq);
         } catch (Exception ex) {
+            log.error("Exception happened when get transaction, message [{}]",ex.getMessage());
             throw GeneralException.builder().refNo(transactionRq.getRefNo()).build();
         }
     }
@@ -34,6 +35,7 @@ public class TransactionController {
         try {
             return transactionService.getTransaction(transactionRq);
         } catch (Exception ex) {
+            log.error("Exception happened when get transaction, message [{}]",ex.getMessage());
             throw GeneralException.builder().refNo(transactionRq.getRefNo()).build();
         }
     }
